@@ -34,11 +34,9 @@ jobs:
       - name: Get Version
         id: get_version_darwin
         run: |
-          $env.version = "go run cmd/version/main.go"
-          $version = Invoke-Expression -Command $env.version
-          $result = $version + "-windows"
-          echo "version=$result" >> $GITHUB_OUTPUT
-        shell: powershell
+          version=$(go run cmd/version/main.go)
+          echo "version=${version}-darwin" >> $GITHUB_OUTPUT
+        shell: bash
 
       - name: Create Release
         id: create_release
