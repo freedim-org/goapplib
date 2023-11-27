@@ -32,9 +32,12 @@ jobs:
           echo "Build MacOS arm64 Done"
           
           lipo -create -output goapplib.macos.universal.dylib goapplib.macos.x86_64.dylib goapplib.macos.arm64.dylib
+          echo "Build MacOS universal Done"
           
           export GOOS=ios
           export GOARCH=arm64
+          export CC=$(xcrun --sdk iphoneos --find clang)
+          export CXX=$(xcrun --sdk iphoneos --find clang++)
           go build -buildmode=c-archive -ldflags="-s -w" -o goapplib.ios.arm64.a ./cmd/cgo/main.go
 
       - name: Get Version
