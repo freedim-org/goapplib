@@ -11,8 +11,8 @@ func init() {
 	server.Start()
 }
 
-func Port() int {
-	return server.Config.Port
+func Port() C.int {
+	return C.int(server.Config.Port)
 }
 
 func main() {}
