@@ -1,0 +1,133 @@
+name: Build Android Dynamic Library
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Golang
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.21
+        id: go
+
+      - name: Set up Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25
+
+      - name: Build
+        run: |
+          go env
+          export CGO_ENABLED=1
+          go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.linux.x86_64.so ./cmd/cgo/main.go
+          echo "Build Linux x86_64 Done"
+          
+          export NDK_VERSION=$(ls -t $ANDROID_HOME/ndk | head -1)
+          export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/$NDK_VERSION
+          export PATH=$PATH:$ANDROID_NDK_HOME
+          export GOOS=android
+          export GOARCH=arm64
+          
+          export ARM64_MATCHING_FILES=$(ls -t $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin | grep "^aarch64.*-clang$" | head -1)
+          export ARM64_BIN=$(echo $ARM64_MATCHING_FILES | head -1)
+          
+          export ARMV7_MATCHING_FILES=$(ls -t $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin | grep "^armv7.*-clang$" | head -1)
+          export ARMV7_BIN=$(echo $ARMV7_MATCHING_FILES | head -1)
+          
+          export X86_MATCHING_FILES=$(ls -t $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin | grep "^i686.*-clang$" | head -1)
+          export X86_BIN=$(echo $X86_MATCHING_FILES | head -1)
+          
+          export X86_64_MATCHING_FILES=$(ls -t $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin | grep "^x86_64.*-clang$" | head -1)
+          export X86_64_BIN=$(echo $X86_64_MATCHING_FILES | head -1)
+          
+          export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/$ARM64_BIN
+          export CXX=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/${ARM64_BIN}++
+          go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.android.arm64.so ./cmd/cgo/main.go
+          echo "Build Android arm64 Done"
+          
+          export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/$ARMV7_BIN
+          export CXX=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/${ARMV7_BIN}++
+          go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.android.armv7.so ./cmd/cgo/main.go
+          echo "Build Android armv7 Done"
+          
+          export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/$X86_BIN
+          export CXX=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/${X86_BIN}++
+          go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.android.i686.so ./cmd/cgo/main.go
+          echo "Build Android i686 Done"
+          
+          export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/$X86_64_BIN
+          export CXX=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/${X86_64_BIN}++
+          go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.android.x86_64.so ./cmd/cgo/main.go
+          echo "Build Android x86_64 Done"
+
+      - name: Get Last Commit
+        id: last_commit
+        run: echo "::set-output name=commit::$(git rev-parse HEAD)"
+
+      - name: Get Version
+        id: version
+        run: echo "::set-output name=version::$(git describe --tags --abbrev=0 --exact-match ${{ steps.last_commit.outputs.commit }} || echo 'unknown')"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          release_name: ${{ steps.version.outputs.version }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Linux x86_64
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./goapplib.linux.x86_64.so
+          asset_name: goapplib.linux.x86_64.so
+          asset_content_type: application/octet-stream
+
+      - name: Upload Android arm64
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./goapplib.android.arm64.so
+          asset_name: goapplib.android.arm64.so
+          asset_content_type: application/octet-stream
+
+      - name: Upload Android armv7
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./goapplib.android.armv7.so
+          asset_name: goapplib.android.armv7.so
+          asset_content_type: application/octet-stream
+
+      - name: Upload Android i686
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./goapplib.android.i686.so
+          asset_name: goapplib.android.i686.so
+          asset_content_type: application/octet-stream
+
+      - name: Upload Android x86_64
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./goapplib.android.x86_64.so
+          asset_name: goapplib.android.x86_64.so
+          asset_content_type: application/octet-stream
