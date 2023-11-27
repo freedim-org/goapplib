@@ -2,7 +2,7 @@ package goapplib
 
 import "net"
 
-func freePort() int {
+func FreePort() int {
 	// 获取空闲端口
 	var a *net.TCPAddr
 	var err error

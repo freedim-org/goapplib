@@ -10,28 +10,28 @@ import (
 
 /*
 Path: localserver.go
-start a local TCP server for communication with the caller.
+Start a local TCP server for communication with the caller.
 */
 
-type localServerConfig struct {
+type LocalServerConfig struct {
 	Port int
 }
 
 type localServer struct {
 	client   *net.TCPConn
 	listener *net.TCPListener
-	config   *localServerConfig
+	Config   *LocalServerConfig
 }
 
-func newLocalServer(config *localServerConfig) *localServer {
+func NewLocalServer(config *LocalServerConfig) *localServer {
 	l := &localServer{
-		config: config,
+		Config: config,
 	}
 	return l
 }
 
-func (l *localServer) start() {
-	addr, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("127.0.0.1:%d", l.config.Port))
+func (l *localServer) Start() {
+	addr, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("127.0.0.1:%d", l.Config.Port))
 	if err != nil {
 		panic(err)
 	}

@@ -1,17 +1,13 @@
 package goapplib
 
-import "C"
-
-var server = newLocalServer(&localServerConfig{
-	Port: freePort(),
+var server = NewLocalServer(&LocalServerConfig{
+	Port: FreePort(),
 })
 
 func init() {
-	server.start()
+	server.Start()
 }
 
 func Port() int {
-	return server.config.Port
+	return server.Config.Port
 }
-
-func main() {}
