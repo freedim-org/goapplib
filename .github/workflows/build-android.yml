@@ -29,43 +29,8 @@ jobs:
         run: |
           go env
           export CGO_ENABLED=1
-          export GOARCH=amd64
-          export GOOS=linux
           go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.linux.x86_64.so ./cmd/cgo/main.go
           
-          export NDK_VERSION=$(ls -t $ANDROID_HOME/ndk | head -1)
-          export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/$NDK_VERSION
-          export PATH=$PATH:$ANDROID_NDK_HOME
-          export GOOS=android
-          export GOARCH=arm64
-          
-          export ARM64_MATCHING_FILES=$(ls -t $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin | grep "^aarch64.*-clang$" | head -1)
-          export ARM64_BIN=$(echo $ARM64_MATCHING_FILES | head -1)
-          
-          export ARMV7_MATCHING_FILES=$(ls -t $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin | grep "^armv7.*-clang$" | head -1)
-          export ARMV7_BIN=$(echo $ARMV7_MATCHING_FILES | head -1)
-          
-          export X86_MATCHING_FILES=$(ls -t $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin | grep "^i686.*-clang$" | head -1)
-          export X86_BIN=$(echo $X86_MATCHING_FILES | head -1)
-          
-          export X86_64_MATCHING_FILES=$(ls -t $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin | grep "^x86_64.*-clang$" | head -1)
-          export X86_64_BIN=$(echo $X86_64_MATCHING_FILES | head -1)
-          
-          export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/$ARM64_BIN
-          export CXX=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/${ARM64_BIN}++
-          go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.android.arm64.so ./cmd/cgo/main.go
-          
-          export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/$ARMV7_BIN
-          export CXX=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/${ARMV7_BIN}++
-          go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.android.armv7.so ./cmd/cgo/main.go
-          
-          export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/$X86_BIN
-          export CXX=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/${X86_BIN}++
-          go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.android.x86.so ./cmd/cgo/main.go
-          
-          export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/$X86_64_BIN
-          export CXX=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/${X86_64_BIN}++
-          go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.android.x86_64.so ./cmd/cgo/main.go
 
       - name: Upload
         uses: actions/upload-artifact@v2
@@ -73,7 +38,3 @@ jobs:
           name: goapplib
           path: |
               goapplib.linux.x86_64.so
-              goapplib.android.arm64.so
-              goapplib.android.armv7.so
-              goapplib.android.x86.so
-              goapplib.android.x86_64.so
