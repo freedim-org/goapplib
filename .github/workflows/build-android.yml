@@ -27,6 +27,8 @@ jobs:
 
       - name: Build
         run: |
+          ls /
+          ls $HOME
           export ANDROID_NDK_HOME=$RUNNER_WORKSPACE/android-ndk-r25
           export PATH=$PATH:$ANDROID_NDK_HOME
           export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android25-clang
@@ -35,7 +37,6 @@ jobs:
           export GOOS=android
           export GOARCH=arm64
           export GO111MODULE=on
-          go mod download
           go build -buildmode=c-shared -ldflags="-s -w" -v -o goapplib.android.arm64.so ./cmd/cgo/main.go
 
       - name: Upload
