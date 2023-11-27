@@ -142,6 +142,7 @@ func loopRead(conn net.Conn) {
 func mockLibCallApp(conn net.Conn) {
 	for {
 		id := NextTraceId()
+		now := time.Now()
 		response := goapplib.CallApp(&goapplib.Request{
 			TraceId: id,
 			Method:  "testCallApp",
@@ -156,7 +157,7 @@ func mockLibCallApp(conn net.Conn) {
 		if response.Data != id {
 			panic(fmt.Sprintf("response.Data != id, response.Data = %s", response.Data))
 		}
-		log.Printf("[INFO] 测试golib主动调用客户端成功, %s", response.TraceId)
+		log.Printf("[INFO] 测试golib主动调用客户端成功, %s, 耗时: %s", response.TraceId, time.Since(now))
 		time.Sleep(time.Second * 5)
 	}
 }
@@ -164,6 +165,7 @@ func mockLibCallApp(conn net.Conn) {
 func mockAppCallLib(conn net.Conn) {
 	for {
 		id := NextTraceId()
+		now := time.Now()
 		response := callLib(conn, &goapplib.Request{
 			TraceId: id,
 			Method:  "test",
@@ -178,7 +180,7 @@ func mockAppCallLib(conn net.Conn) {
 		if response.Data != id {
 			panic(fmt.Sprintf("response.Data != id, response.Data = %s", response.Data))
 		}
-		log.Printf("[INFO] 测试客户端主动调用golib成功, %s", response.TraceId)
+		log.Printf("[INFO] 测试客户端主动调用golib成功, %s, 耗时: %s", response.TraceId, time.Since(now))
 		time.Sleep(time.Second * 6)
 	}
 }
