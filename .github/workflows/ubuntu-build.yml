@@ -38,18 +38,15 @@ jobs:
           export GOOS=android
           export GOARCH=arm64
           
-          export ARM64_MATCHING_FILES=$(ls -t $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin | grep "^aarch64.*-clang$" | head -1)
+          export ARM64_MATCHING_FILES=$(ls -1 $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin | grep "^aarch64.*-clang$" | head -1)
           export ARM64_BIN=$(echo $ARM64_MATCHING_FILES | head -1)
-          
-          export ARMV7_MATCHING_FILES=$(ls -t $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin | grep "^armv7.*-clang$" | head -1)
+          export ARMV7_MATCHING_FILES=$(ls -1 $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin | grep "^armv7.*-clang$" | head -1)
           export ARMV7_BIN=$(echo $ARMV7_MATCHING_FILES | head -1)
-          
-          export X86_MATCHING_FILES=$(ls -t $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin | grep "^i686.*-clang$" | head -1)
+          export X86_MATCHING_FILES=$(ls -1 $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin | grep "^i686.*-clang$" | head -1)
           export X86_BIN=$(echo $X86_MATCHING_FILES | head -1)
-          
-          export X86_64_MATCHING_FILES=$(ls -t $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin | grep "^x86_64.*-clang$" | head -1)
+          export X86_64_MATCHING_FILES=$(ls -1 $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin | grep "^x86_64.*-clang$" | head -1)
           export X86_64_BIN=$(echo $X86_64_MATCHING_FILES | head -1)
-          
+
           export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/$ARM64_BIN
           export CXX=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/${ARM64_BIN}++
           go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.android.arm64.so ./cmd/cgo/main.go
