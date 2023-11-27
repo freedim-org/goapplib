@@ -34,9 +34,9 @@ jobs:
       - name: Get Version
         id: get_version_darwin
         run: |
-          @echo off
-          for /f "delims=" %%i in ('go run cmd/version/main.go') do set version=%%i
-          echo "::set-output name=version::%version%-windows"
+          - @echo off
+          - for /f "delims=" %%i in ('go run cmd/version/main.go') do set version=%%i
+          - echo "::set-output name=version::%version%-windows"
 
       - name: Create Release
         id: create_release
