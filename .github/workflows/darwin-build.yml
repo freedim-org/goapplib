@@ -27,14 +27,14 @@ jobs:
           go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.macos.x86_64.dylib ./cmd/cgo/main.go
           echo "Build MacOS x86_64 Done"
           
-          GOARCH=arm64
+          export GOARCH=arm64
           go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.macos.arm64.dylib ./cmd/cgo/main.go
           echo "Build MacOS arm64 Done"
           
           lipo -create -output goapplib.macos.universal.dylib goapplib.macos.x86_64.dylib goapplib.macos.arm64.dylib
           
-          GOOS=ios
-          GOARCH=arm64
+          export GOOS=ios
+          export GOARCH=arm64
           go build -buildmode=c-archive -ldflags="-s -w" -o goapplib.ios.arm64.a ./cmd/cgo/main.go
 
       - name: Get Version
