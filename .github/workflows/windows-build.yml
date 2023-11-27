@@ -23,10 +23,12 @@ jobs:
       - name: Build
         run: |
           go env
-          CGO_ENABLED=1 go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.windows.x86_64.dll ./cmd/cgo/main.go
+          set CGO_ENABLED=1
+          go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.windows.x86_64.dll ./cmd/cgo/main.go
           echo "Build Windows x86_64 Done"
           
-          CGO_ENABLED=1 GOARCH=arm64 go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.windows.arm64.dll ./cmd/cgo/main.go
+          set GOARCH=arm64
+          go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.windows.arm64.dll ./cmd/cgo/main.go
           echo "Build Windows arm64 Done"
 
       - name: Get Version

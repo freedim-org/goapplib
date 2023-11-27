@@ -20,11 +20,6 @@ jobs:
           go-version: 1.21
         id: go
 
-      - name: Set active Xcode path
-        run: |
-          XCODE_VERSION=15.0
-          sudo xcode-select -s /Applications/Xcode_$XCODE_VERSION.app/Contents/Developer
-
       - name: Build
         run: |
           go env
