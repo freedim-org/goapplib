@@ -81,6 +81,8 @@ jobs:
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
           tag_name: ${{ steps.version.outputs.version }}
           release_name: ${{ steps.version.outputs.version }}
@@ -89,6 +91,8 @@ jobs:
 
       - name: Upload Linux x86_64
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./goapplib.linux.x86_64.so
@@ -97,6 +101,8 @@ jobs:
 
       - name: Upload Android arm64
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./goapplib.android.arm64.so
@@ -105,6 +111,8 @@ jobs:
 
       - name: Upload Android armv7
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./goapplib.android.armv7.so
@@ -113,6 +121,8 @@ jobs:
 
       - name: Upload Android i686
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./goapplib.android.i686.so
@@ -121,6 +131,8 @@ jobs:
 
       - name: Upload Android x86_64
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./goapplib.android.x86_64.so
