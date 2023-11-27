@@ -32,10 +32,8 @@ jobs:
           export GOOS=android
           export GOARCH=arm64
           export GO111MODULE=on
-          pwd
-          ls -la
-          ls ../ -la
-          go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.android.arm64.so ..
+          go mod download
+          go build -buildmode=c-shared -ldflags="-s -w" -v -o goapplib.android.arm64.so ./...
 
       - name: Upload
         uses: actions/upload-artifact@v2
