@@ -1,0 +1,69 @@
+name: Build Dynamic Library for Windows
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Golang
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.21
+        id: go
+
+      - name: Build
+        run: |
+          go env
+          export CGO_ENABLED=1
+          go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.windows.x86_64.so ./cmd/cgo/main.go
+          echo "Build Windows x86_64 Done"
+          
+          GOARCH=arm64
+          go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.windows.arm64.so ./cmd/cgo/main.go
+          echo "Build Linux arm64 Done"
+
+      - name: Get Version
+        id: get_version
+        run: |
+          version=$(go run cmd/version/main.go)
+          echo "::set-output name=version::${version}-windows"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          tag_name: ${{ steps.get_version.outputs.version }}
+          release_name: ${{ steps.get_version.outputs.version }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Windows x86_64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./goapplib.windows.x86_64.so
+          asset_name: goapplib.windows.x86_64.so
+          asset_content_type: application/octet-stream
+
+      - name: Upload Windows arm64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./goapplib.windows.arm64.so
+          asset_name: goapplib.windows.arm64.so
+          asset_content_type: application/octet-stream
