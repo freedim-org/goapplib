@@ -65,8 +65,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./goapplib.macos.x86_64.so
-          asset_name: goapplib.macos.x86_64.so
+          asset_path: ./goapplib.macos.x86_64.dylib
+          asset_name: goapplib.macos.x86_64.dylib
           asset_content_type: application/octet-stream
 
       - name: Upload MacOS arm64
@@ -75,8 +75,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./goapplib.macos.arm64.so
-          asset_name: goapplib.macos.arm64.so
+          asset_path: ./goapplib.macos.arm64.dylib
+          asset_name: goapplib.macos.arm64.dylib
           asset_content_type: application/octet-stream
 
       - name: Upload MacOS universal
@@ -85,8 +85,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./goapplib.macos.universal.so
-          asset_name: goapplib.macos.universal.so
+          asset_path: ./goapplib.macos.universal.dylib
+          asset_name: goapplib.macos.universal.dylib
           asset_content_type: application/octet-stream
 
       - name: Upload iOS arm64
