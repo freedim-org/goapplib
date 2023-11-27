@@ -35,7 +35,7 @@ jobs:
         id: get_version_windows
         run: |
           version=$(go run cmd/version/main.go)
-          echo "version=${version}-darwin" >> $GITHUB_OUTPUT
+          echo "version=${version}-windows" >> $GITHUB_OUTPUT
         shell: bash
 
       - name: Create Release
