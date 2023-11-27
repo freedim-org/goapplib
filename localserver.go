@@ -14,7 +14,7 @@ Start a local TCP server for communication with the caller.
 */
 
 type LocalServerConfig struct {
-	Port int
+	Port int32
 }
 
 type localServer struct {

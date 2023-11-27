@@ -2,7 +2,7 @@ package goapplib
 
 import "net"
 
-func FreePort() int {
+func FreePort() int32 {
 	// 获取空闲端口
 	var a *net.TCPAddr
 	var err error
@@ -10,7 +10,7 @@ func FreePort() int {
 		var l *net.TCPListener
 		if l, err = net.ListenTCP("tcp", a); err == nil {
 			defer l.Close()
-			return l.Addr().(*net.TCPAddr).Port
+			return int32(l.Addr().(*net.TCPAddr).Port)
 		}
 	}
 	panic(err)

@@ -8,6 +8,6 @@ func init() {
 	server.Start()
 }
 
-func Port() int {
+func Port() int32 {
 	return server.Config.Port
 }
