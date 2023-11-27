@@ -35,7 +35,7 @@ jobs:
         id: get_version_darwin
         run: |
           $version = go run cmd/version/main.go
-          Write-Host "::set-output name=version::${version}-windows"
+          echo "::set-output name=version::${version}-windows"
         shell: powershell
 
       - name: Create Release
