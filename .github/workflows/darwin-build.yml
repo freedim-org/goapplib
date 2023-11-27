@@ -38,6 +38,8 @@ jobs:
           export GOARCH=arm64
           export CC=$(xcrun --sdk iphoneos --find clang)
           export CXX=$(xcrun --sdk iphoneos --find clang++)
+          export IOS_SDK_PATH=$(xcrun --sdk iphoneos --show-sdk-path)
+          export CGO_CFLAGS="-arch arm64 -isysroot $IOS_SDK_PATH -miphoneos-version-min=11.0"
           go build -buildmode=c-archive -ldflags="-s -w" -o goapplib.ios.arm64.a ./cmd/cgo/main.go
 
       - name: Get Version
