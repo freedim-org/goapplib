@@ -32,7 +32,7 @@ jobs:
           echo "Build Windows arm64 Done"
 
       - name: Get Version
-        id: get_version_darwin
+        id: get_version_windows
         run: |
           version=$(go run cmd/version/main.go)
           echo "version=${version}-darwin" >> $GITHUB_OUTPUT
