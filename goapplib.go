@@ -1,16 +1,24 @@
 package goapplib
 
-import (
-	"fmt"
-	"github.com/freedim-org/goapplib/tools"
-)
+var server *LocalServer
 
-var server = NewLocalServer(&LocalServerConfig{
-	Address: fmt.Sprintf("127.0.0.1:%d", tools.FreePort()),
-})
-
-func init() {
+func Init(c *LocalServerConfig) {
+	dft := DefaultLocalServerConfig()
+	if c == nil {
+		c = dft
+	}
+	if c.Address == "" {
+		c.Address = dft.Address
+	}
+	if c.Callback == nil {
+		c.Callback = dft.Callback
+	}
+	server = NewLocalServer(c)
 	server.Start()
+}
+
+func CallApp(req *Request) *Response {
+	return server.callApp(req)
 }
 
 func Address() string {

@@ -12,16 +12,21 @@ type dataPack struct{}
 var DP = &dataPack{}
 
 type Message struct {
-	len  uint32
-	data string
+	Len        uint32
+	IsResponse bool
+	Data       string
 }
 
 func (m *Message) GetDataLen() uint32 {
-	return m.len
+	return m.Len
+}
+
+func (m *Message) IsResp() bool {
+	return m.IsResponse
 }
 
 func (m *Message) GetData() string {
-	return m.data
+	return m.Data
 }
 
 // Pack 封包方法(压缩数据)
@@ -31,6 +36,15 @@ func (dp *dataPack) Pack(msg *Message) ([]byte, error) {
 
 	//写dataLen
 	if err := binary.Write(dataBuff, binary.LittleEndian, msg.GetDataLen()); err != nil {
+		return nil, err
+	}
+
+	//写isResponse
+	isResp := int8(0)
+	if msg.IsResp() {
+		isResp = 1
+	}
+	if err := binary.Write(dataBuff, binary.LittleEndian, isResp); err != nil {
 		return nil, err
 	}
 
@@ -45,20 +59,22 @@ func (dp *dataPack) Pack(msg *Message) ([]byte, error) {
 // Unpack 拆包方法(解压数据)
 func (dp *dataPack) Unpack(conn net.Conn) (*Message, error) {
 	//先读出dataLen
-	headData := make([]byte, 4)
+	headData := make([]byte, 5)
 	_, err := io.ReadFull(conn, headData)
 	if err != nil {
 		return nil, err
 	}
 	//只解压head的信息，得到dataLen和msgId
 	msg := &Message{
-		len: binary.LittleEndian.Uint32(headData),
+		Len: binary.LittleEndian.Uint32(headData[:4]),
 	}
-	dataTmp := make([]byte, msg.len)
+	//读isResponse
+	msg.IsResponse = headData[4] == 1
+	dataTmp := make([]byte, msg.Len)
 	//读data数据
 	if err := binary.Read(conn, binary.LittleEndian, &dataTmp); err != nil {
 		return nil, err
 	}
-	msg.data = string(dataTmp)
+	msg.Data = string(dataTmp)
 	return msg, nil
 }
