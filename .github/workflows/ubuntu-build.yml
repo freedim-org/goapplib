@@ -36,7 +36,6 @@ jobs:
           export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/$NDK_VERSION
           export PATH=$PATH:$ANDROID_NDK_HOME
           export GOOS=android
-          export GOARCH=arm64
           
           export ARM64_MATCHING_FILES=$(ls -1 $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin | grep "^aarch64.*-clang$" | head -1)
           export ARM64_BIN=$(echo $ARM64_MATCHING_FILES | head -1)
@@ -46,22 +45,26 @@ jobs:
           export X86_BIN=$(echo $X86_MATCHING_FILES | head -1)
           export X86_64_MATCHING_FILES=$(ls -1 $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin | grep "^x86_64.*-clang$" | head -1)
           export X86_64_BIN=$(echo $X86_64_MATCHING_FILES | head -1)
-
+          
+          export GOARCH=arm64
           export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/$ARM64_BIN
           export CXX=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/${ARM64_BIN}++
           go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.android.arm64.so ./cmd/cgo/main.go
           echo "Build Android arm64 Done"
           
+          export GOARCH=arm
           export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/$ARMV7_BIN
           export CXX=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/${ARMV7_BIN}++
           go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.android.armv7.so ./cmd/cgo/main.go
           echo "Build Android armv7 Done"
           
+          export GOARCH=386
           export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/$X86_BIN
           export CXX=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/${X86_BIN}++
           go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.android.i686.so ./cmd/cgo/main.go
           echo "Build Android i686 Done"
           
+          export GOARCH=amd64
           export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/$X86_64_BIN
           export CXX=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/${X86_64_BIN}++
           go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.android.x86_64.so ./cmd/cgo/main.go
