@@ -20,7 +20,7 @@ jobs:
       - name: Set up Android NDK
         uses: nttld/setup-ndk@v1
         with:
-          version: 'r25'
+          ndk-version: r25
 
       - name: Build
         run: |
