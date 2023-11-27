@@ -18,7 +18,7 @@ jobs:
         id: go
 
       - name: Set up Android NDK
-        uses: bep/android-ndk-installer@v1
+        uses: r0adkll/setup-android-ndk@v1
         with:
           version: 'r21'
 
