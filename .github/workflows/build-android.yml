@@ -34,7 +34,6 @@ jobs:
           
           export NDK_VERSION=$(ls -t $ANDROID_HOME/ndk | head -1)
           export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/$NDK_VERSION
-          ls -l $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin
           export PATH=$PATH:$ANDROID_NDK_HOME
           export GOOS=android
           export GOARCH=arm64
@@ -66,7 +65,7 @@ jobs:
           export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/$X86_64_BIN
           export CXX=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/${X86_64_BIN}++
           go build -buildmode=c-shared -ldflags="-s -w" -v -o goapplib.android.x86_64.so ./cmd/cgo/main.go
-          
+
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
