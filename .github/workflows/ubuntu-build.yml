@@ -32,6 +32,10 @@ jobs:
           go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.linux.x86_64.so ./cmd/cgo/main.go
           echo "Build Linux x86_64 Done"
           
+          GOARCH=arm64
+          go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.linux.arm64.so ./cmd/cgo/main.go
+          echo "Build Linux arm64 Done"
+          
           export NDK_VERSION=$(ls -t $ANDROID_HOME/ndk | head -1)
           export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/$NDK_VERSION
           export PATH=$PATH:$ANDROID_NDK_HOME
@@ -94,6 +98,16 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./goapplib.linux.x86_64.so
           asset_name: goapplib.linux.x86_64.so
+          asset_content_type: application/octet-stream
+
+      - name: Upload Linux arm64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./goapplib.linux.arm64.so
+          asset_name: goapplib.linux.arm64.so
           asset_content_type: application/octet-stream
 
       - name: Upload Android arm64
