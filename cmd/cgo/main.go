@@ -11,6 +11,7 @@ func init() {
 	server.Start()
 }
 
+//export Port
 func Port() C.int {
 	return C.int(server.Config.Port)
 }
