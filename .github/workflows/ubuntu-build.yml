@@ -55,11 +55,6 @@ jobs:
           go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.android.arm64.so ./cmd/cgo/main.go
           echo "Build Android arm64 Done"
           
-          export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/$ARMV7_BIN
-          export CXX=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/${ARMV7_BIN}++
-          go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.android.armv7.so ./cmd/cgo/main.go
-          echo "Build Android armv7 Done"
-          
           export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/$X86_BIN
           export CXX=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/${X86_BIN}++
           go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.android.i686.so ./cmd/cgo/main.go
@@ -101,14 +96,6 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./goapplib.android.arm64.so
           asset_name: goapplib.android.arm64.so
-          asset_content_type: application/octet-stream
-
-      - name: Upload Android armv7
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./goapplib.android.armv7.so
-          asset_name: goapplib.android.armv7.so
           asset_content_type: application/octet-stream
 
       - name: Upload Android i686
