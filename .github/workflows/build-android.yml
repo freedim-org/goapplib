@@ -28,7 +28,9 @@ jobs:
       - name: Build
         run: |
           echo "ANDROID_HOME=$ANDROID_HOME"
-          echo "NDK_VERSION=$NDK_VERSION"
+          ls -l $ANDROID_HOME
+          ls -l $ANDROID_HOME/ndk
+          export NDK_VERSION=r25
           export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/$NDK_VERSION
           export PATH=$PATH:$ANDROID_NDK_HOME
           export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android25-clang
