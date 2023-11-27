@@ -29,6 +29,8 @@ jobs:
         run: |
           go clean -cache
           export CGO_ENABLED=1
+          export GOARCH=amd64
+          export GOOS=linux
           go build -buildmode=c-shared -ldflags="-s -w" -o goapplib.linux.x86_64.so ./cmd/cgo/main.go
           
           export NDK_VERSION=$(ls -t $ANDROID_HOME/ndk | head -1)
