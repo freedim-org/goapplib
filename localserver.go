@@ -1,7 +1,7 @@
 package goapplib
 
 import (
-	"fmt"
+	"github.com/freedim-org/goapplib/dp"
 	"io"
 	"net"
 	"os"
@@ -14,24 +14,24 @@ Start a local TCP server for communication with the caller.
 */
 
 type LocalServerConfig struct {
-	Port int32
+	Address string
 }
 
-type localServer struct {
+type LocalServer struct {
 	client   *net.TCPConn
 	listener *net.TCPListener
 	Config   *LocalServerConfig
 }
 
-func NewLocalServer(config *LocalServerConfig) *localServer {
-	l := &localServer{
+func NewLocalServer(config *LocalServerConfig) *LocalServer {
+	l := &LocalServer{
 		Config: config,
 	}
 	return l
 }
 
-func (l *localServer) Start() {
-	addr, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("127.0.0.1:%d", l.Config.Port))
+func (l *LocalServer) Start() {
+	addr, err := net.ResolveTCPAddr("tcp", l.Config.Address)
 	if err != nil {
 		panic(err)
 	}
@@ -49,7 +49,7 @@ func (l *localServer) Start() {
 	return
 }
 
-func (l *localServer) acceptOnce() error {
+func (l *LocalServer) acceptOnce() error {
 	conn, err := l.listener.AcceptTCP()
 	if err != nil {
 		return err
@@ -58,9 +58,9 @@ func (l *localServer) acceptOnce() error {
 	return nil
 }
 
-func (l *localServer) loopRead() {
+func (l *LocalServer) loopRead() {
 	for {
-		msg, err := DP.Unpack(l.client)
+		msg, err := dp.DP.Unpack(l.client)
 		if err != nil {
 			if err == io.EOF {
 				// connection closed
@@ -76,6 +76,6 @@ func (l *localServer) loopRead() {
 	}
 }
 
-func (l *localServer) onNewData(data string) {
+func (l *LocalServer) onNewData(data string) {
 
 }

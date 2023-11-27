@@ -3,7 +3,7 @@ package goapplib
 import "fmt"
 
 var server = NewLocalServer(&LocalServerConfig{
-	Port: FreePort(),
+	Address: fmt.Sprintf("127.0.0.1:%d", FreePort()),
 })
 
 func init() {
@@ -11,5 +11,5 @@ func init() {
 }
 
 func Address() string {
-	return fmt.Sprintf("127.0.0.1:%d", server.Config.Port)
+	return server.Config.Address
 }

@@ -1,4 +1,4 @@
-package goapplib
+package dp
 
 import (
 	"bytes"
@@ -11,21 +11,21 @@ type dataPack struct{}
 
 var DP = &dataPack{}
 
-type DPMessage struct {
+type Message struct {
 	len  uint32
 	data string
 }
 
-func (m *DPMessage) GetDataLen() uint32 {
+func (m *Message) GetDataLen() uint32 {
 	return m.len
 }
 
-func (m *DPMessage) GetData() string {
+func (m *Message) GetData() string {
 	return m.data
 }
 
 // Pack 封包方法(压缩数据)
-func (dp *dataPack) Pack(msg *DPMessage) ([]byte, error) {
+func (dp *dataPack) Pack(msg *Message) ([]byte, error) {
 	//创建一个存放bytes字节的缓冲
 	dataBuff := bytes.NewBuffer([]byte{})
 
@@ -43,7 +43,7 @@ func (dp *dataPack) Pack(msg *DPMessage) ([]byte, error) {
 }
 
 // Unpack 拆包方法(解压数据)
-func (dp *dataPack) Unpack(conn net.Conn) (*DPMessage, error) {
+func (dp *dataPack) Unpack(conn net.Conn) (*Message, error) {
 	//先读出dataLen
 	headData := make([]byte, 4)
 	_, err := io.ReadFull(conn, headData)
@@ -51,7 +51,7 @@ func (dp *dataPack) Unpack(conn net.Conn) (*DPMessage, error) {
 		return nil, err
 	}
 	//只解压head的信息，得到dataLen和msgId
-	msg := &DPMessage{
+	msg := &Message{
 		len: binary.LittleEndian.Uint32(headData),
 	}
 	dataTmp := make([]byte, msg.len)
