@@ -34,9 +34,6 @@ jobs:
       - name: Get Version
         id: get_version_darwin
         run: |
-#          version=$(go run cmd/version/main.go)
-#          echo "::set-output name=version::${version}-windows"
-#          windows 不支持上面的命令，应该这么写
           @echo off
           for /f "delims=" %%i in ('go run cmd/version/main.go') do set version=%%i
           echo "::set-output name=version::%version%-windows"
