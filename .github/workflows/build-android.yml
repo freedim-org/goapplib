@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
       - name: Set up Golang
         uses: actions/setup-go@v4
         with:
@@ -24,9 +27,6 @@ jobs:
 
       - name: Build
         run: |
-          ls -la
-          ls .. -al
-          pwd
           export ANDROID_NDK_HOME=$RUNNER_WORKSPACE/android-ndk-r25
           export PATH=$PATH:$ANDROID_NDK_HOME
           export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android25-clang
