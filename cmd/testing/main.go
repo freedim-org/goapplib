@@ -17,6 +17,10 @@ import (
 
 type callback struct{}
 
+func (c *callback) OnAppReady() {
+	log.Printf("[INFO] goapplib.OnAppReady")
+}
+
 func (c *callback) OnAppCall(request *goapplib.Request) (response *goapplib.Response) {
 	switch request.Method {
 	case "test", "":

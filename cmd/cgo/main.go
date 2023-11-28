@@ -27,6 +27,8 @@ func main() {}
 
 type callback struct{}
 
+func (c *callback) OnAppReady() {}
+
 func (c *callback) OnAppCall(request *goapplib.Request) (response *goapplib.Response) {
 	response = &goapplib.Response{
 		TraceId: request.TraceId,

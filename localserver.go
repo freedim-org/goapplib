@@ -57,6 +57,7 @@ func (l *LocalServer) Start() {
 		if err != nil {
 			panic(err)
 		}
+		l.Config.Callback.OnAppReady()
 		l.loopRead()
 	}()
 	return

@@ -17,6 +17,18 @@ func (r *Request) Marshal() string {
 	return string(data)
 }
 
+func (r *Request) Parse(in any) error {
+	return json.Unmarshal([]byte(r.Data), in)
+}
+
+func (r *Request) ParseError(err error) *Response {
+	return &Response{
+		TraceId: r.TraceId,
+		Code:    CodeInvalidRequest,
+		Data:    err.Error(),
+	}
+}
+
 type Code int
 
 const (
