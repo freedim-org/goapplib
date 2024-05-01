@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package goapplib;
+option go_package = "./goapplib";
+
+message GoRequest {
+  string traceId = 1;
+  string method = 2;
+  bytes  data = 3;
+}
+
+enum Code {
+  OK = 0;
+  InvalidRequest = 400;
+  MethodNotFound = 404;
+  InternalError = 500;
+  MethodNullResponse = 501;
+}
+
+message GoResponse {
+  string traceId = 1;
+  Code code = 2;
+  bytes data = 3;
+}

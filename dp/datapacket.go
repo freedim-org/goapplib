@@ -14,7 +14,7 @@ var DP = &dataPack{}
 type Message struct {
 	Len        uint32
 	IsResponse bool
-	Data       string
+	Data       []byte
 }
 
 func (m *Message) GetDataLen() uint32 {
@@ -25,7 +25,7 @@ func (m *Message) IsResp() bool {
 	return m.IsResponse
 }
 
-func (m *Message) GetData() string {
+func (m *Message) GetData() []byte {
 	return m.Data
 }
 
@@ -75,6 +75,6 @@ func (dp *dataPack) Unpack(conn net.Conn) (*Message, error) {
 	if err := binary.Read(conn, binary.LittleEndian, &dataTmp); err != nil {
 		return nil, err
 	}
-	msg.Data = string(dataTmp)
+	msg.Data = dataTmp
 	return msg, nil
 }

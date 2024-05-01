@@ -17,7 +17,7 @@ func Init(c *LocalServerConfig) {
 	server.Start()
 }
 
-func CallApp(req *Request) *Response {
+func CallApp(req *GoRequest) *GoResponse {
 	return server.callApp(req)
 }
 

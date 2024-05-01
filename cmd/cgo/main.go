@@ -29,11 +29,11 @@ type callback struct{}
 
 func (c *callback) OnAppReady() {}
 
-func (c *callback) OnAppCall(request *goapplib.Request) (response *goapplib.Response) {
-	response = &goapplib.Response{
+func (c *callback) OnAppCall(request *goapplib.GoRequest) (response *goapplib.GoResponse) {
+	response = &goapplib.GoResponse{
 		TraceId: request.TraceId,
-		Code:    goapplib.CodeOK,
-		Data:    "Hello, world!",
+		Code:    goapplib.Code_OK,
+		Data:    []byte{},
 	}
 	return
 }

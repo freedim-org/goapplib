@@ -7,7 +7,6 @@ import (
 	"io"
 	"log"
 	"net"
-	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -21,17 +20,17 @@ func (c *callback) OnAppReady() {
 	log.Printf("[INFO] goapplib.OnAppReady")
 }
 
-func (c *callback) OnAppCall(request *goapplib.Request) (response *goapplib.Response) {
+func (c *callback) OnAppCall(request *goapplib.GoRequest) (response *goapplib.GoResponse) {
 	switch request.Method {
 	case "test", "":
-		response = &goapplib.Response{
-			Code: goapplib.CodeOK,
+		response = &goapplib.GoResponse{
+			Code: goapplib.Code_OK,
 			Data: request.Data,
 		}
 	default:
-		response = &goapplib.Response{
-			Code: goapplib.CodeMethodNotFound,
-			Data: "",
+		response = &goapplib.GoResponse{
+			Code: goapplib.Code_MethodNotFound,
+			Data: []byte{},
 		}
 	}
 	return
@@ -50,8 +49,8 @@ func NextTraceId() string {
 
 var responseChanMap sync.Map
 
-func onNewResponse(conn net.Conn, data string) {
-	response := &goapplib.Response{}
+func onNewResponse(conn net.Conn, data []byte) {
+	response := &goapplib.GoResponse{}
 	err := response.Unmarshal(data)
 	if err != nil {
 		panic(err)
@@ -60,27 +59,27 @@ func onNewResponse(conn net.Conn, data string) {
 	if !ok {
 		panic(fmt.Sprintf("responseChanMap.Load(response.TraceId) failed, response.TraceId = %s", response.TraceId))
 	}
-	ch.(chan *goapplib.Response) <- response
+	ch.(chan *goapplib.GoResponse) <- response
 }
 
-func onNewRequest(conn net.Conn, data string) {
-	request := &goapplib.Request{}
+func onNewRequest(conn net.Conn, data []byte) {
+	request := &goapplib.GoRequest{}
 	err := request.Unmarshal(data)
 	if err != nil {
 		panic(err)
 	}
 	switch request.Method {
 	case "testCallApp":
-		response := &goapplib.Response{
+		response := &goapplib.GoResponse{
 			TraceId: request.TraceId,
-			Code:    goapplib.CodeOK,
+			Code:    goapplib.Code_OK,
 			Data:    request.Data,
 		}
 		sendResponse(conn, response)
 	}
 }
 
-func sendResponse(conn net.Conn, response *goapplib.Response) {
+func sendResponse(conn net.Conn, response *goapplib.GoResponse) {
 	data := response.Marshal()
 	pack, err := dp.DP.Pack(&dp.Message{
 		Len:        uint32(len(data)),
@@ -98,7 +97,7 @@ func sendResponse(conn net.Conn, response *goapplib.Response) {
 	}
 }
 
-func callLib(conn net.Conn, req *goapplib.Request) *goapplib.Response {
+func callLib(conn net.Conn, req *goapplib.GoRequest) *goapplib.GoResponse {
 	data := req.Marshal()
 	pack, err := dp.DP.Pack(&dp.Message{
 		Len:        uint32(len(data)),
@@ -108,12 +107,16 @@ func callLib(conn net.Conn, req *goapplib.Request) *goapplib.Response {
 	if err != nil {
 		panic(err)
 	}
-	ch := make(chan *goapplib.Response)
+	ch := make(chan *goapplib.GoResponse)
 	responseChanMap.Store(req.TraceId, ch)
 	defer responseChanMap.Delete(req.TraceId)
 	_, err = conn.Write(pack)
 	if err != nil {
-		panic(err)
+		return &goapplib.GoResponse{
+			TraceId: req.TraceId,
+			Code:    goapplib.Code_InternalError,
+			Data:    []byte("Write failed"),
+		}
 	}
 	response := <-ch
 	return response
@@ -125,13 +128,13 @@ func loopRead(conn net.Conn) {
 		if err != nil {
 			if err == io.EOF {
 				// connection closed
-				os.Exit(0)
+				return
 			}
 			// use of closed network connection
 			if strings.HasSuffix(err.Error(), "use of closed network connection") {
-				os.Exit(0)
+				return
 			}
-			panic(err)
+			return
 		}
 		if msg.IsResp() {
 			// response
@@ -147,18 +150,18 @@ func mockLibCallApp(conn net.Conn) {
 	for {
 		id := NextTraceId()
 		now := time.Now()
-		response := goapplib.CallApp(&goapplib.Request{
+		response := goapplib.CallApp(&goapplib.GoRequest{
 			TraceId: id,
 			Method:  "testCallApp",
-			Data:    id,
+			Data:    []byte(id),
 		})
 		if response == nil {
 			panic("response is nil")
 		}
-		if response.Code != goapplib.CodeOK {
+		if response.Code != goapplib.Code_OK {
 			panic(fmt.Sprintf("response.Code != goapplib.CodeOK, response.Code = %d", response.Code))
 		}
-		if response.Data != id {
+		if string(response.Data) != id {
 			panic(fmt.Sprintf("response.Data != id, response.Data = %s", response.Data))
 		}
 		log.Printf("[INFO] 测试golib主动调用客户端成功, %s, 耗时: %s", response.TraceId, time.Since(now))
@@ -170,19 +173,21 @@ func mockAppCallLib(conn net.Conn) {
 	for {
 		id := NextTraceId()
 		now := time.Now()
-		response := callLib(conn, &goapplib.Request{
+		response := callLib(conn, &goapplib.GoRequest{
 			TraceId: id,
 			Method:  "test",
-			Data:    id,
+			Data:    []byte(id),
 		})
 		if response == nil {
 			panic("response is nil")
 		}
-		if response.Code != goapplib.CodeOK {
-			panic(fmt.Sprintf("response.Code != goapplib.CodeOK, response.Code = %d", response.Code))
+		if response.Code != goapplib.Code_OK {
+			log.Print(fmt.Sprintf("response.Code != goapplib.CodeOK, response.Code = %d", response.Code))
+			return
 		}
-		if response.Data != id {
-			panic(fmt.Sprintf("response.Data != id, response.Data = %s", response.Data))
+		if string(response.Data) != id {
+			log.Print(fmt.Sprintf("response.Data != id, response.Data = %s", response.Data))
+			return
 		}
 		log.Printf("[INFO] 测试客户端主动调用golib成功, %s, 耗时: %s", response.TraceId, time.Since(now))
 		time.Sleep(time.Second * 6)
@@ -196,13 +201,26 @@ func main() {
 	})
 	log.Printf("[INFO] goapplib.Address() = %s", goapplib.Address())
 	time.Sleep(time.Millisecond * 100)
-	conn, err := net.Dial("tcp", goapplib.Address())
-	if err != nil {
-		panic(err)
+	{
+		conn, err := net.Dial("tcp", goapplib.Address())
+		if err != nil {
+			panic(err)
+		}
+		go loopRead(conn)
+		go mockLibCallApp(conn) // 模拟golib主动调用客户端
+		go mockAppCallLib(conn) // 模拟客户端主动调用golib
+		time.Sleep(time.Second * 3)
+		conn.Close()
 	}
-	defer conn.Close()
-	go loopRead(conn)
-	go mockLibCallApp(conn) // 模拟golib主动调用客户端
-	go mockAppCallLib(conn) // 模拟客户端主动调用golib
-	time.Sleep(time.Minute)
+	{
+		conn, err := net.Dial("tcp", goapplib.Address())
+		if err != nil {
+			panic(err)
+		}
+		go loopRead(conn)
+		go mockLibCallApp(conn) // 模拟golib主动调用客户端
+		go mockAppCallLib(conn) // 模拟客户端主动调用golib
+		time.Sleep(time.Second * 100)
+		conn.Close()
+	}
 }
